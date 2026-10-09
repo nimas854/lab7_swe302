@@ -1,0 +1,63 @@
+{
+  "nextId": 3,
+  "students": [
+    {
+      "id": "02240358",
+      "password": "8d22cce2130bcb7d:0dba53ed56fddf60643380b5a30af3236f4d8e02c563221cd8f408dd25963085"
+    }
+  ],
+  "staff": [
+    {
+      "id": "admin01",
+      "name": "Administrator",
+      "role": "admin",
+      "password": "f66493621d8940ed:6e9a85c3bf0cf8add463a3f24553b167d4f17c3bb69386fe48c53e7d5f2cb08f",
+      "authorised": true
+    },
+    {
+      "id": "T001",
+      "name": "Karma Dorji",
+      "role": "teacher",
+      "password": "c84952b33db1d092:5ea54f8692c33f43e0fbc569a0fb976065d13c53e7650b4c4e1bb30eb4487bcc",
+      "authorised": true
+    },
+    {
+      "id": "T002",
+      "name": "Sonam Choden",
+      "role": "teacher",
+      "password": "7d77dec7eed95c64:a360627229ceb8c1d710cd12f952269fc86c43275dec6a9bc1e74c3796f37641",
+      "authorised": false
+    },
+    {
+      "id": "T003",
+      "name": "Pema Lhamo",
+      "role": "teacher",
+      "password": "1ded41f68821b5ec:d73d53183790bbd5d1acf184cdef2fce65a5ca297d7d5c2d8096db0f693b06f2",
+      "authorised": false
+    }
+  ],
+  "payments": [
+    {
+      "id": 1,
+      "studentId": "02240358",
+      "txn": "123-123456789",
+      "file": "images (1).jpg",
+      "stored": "1-images__1_.jpg",
+      "status": "Verified"
+    }
+  ],
+  "registrations": [
+    {
+      "id": 0,
+      "studentId": "02240358",
+      "module": "SWE302 - Software Testing & Quality Assurance",
+      "status": "Approved"
+    },
+    {
+      "id": 2,
+      "studentId": "02240358",
+      "module": "DBS201 - Database Systems",
+      "status": "Approved"
+    }
+  ]
+}

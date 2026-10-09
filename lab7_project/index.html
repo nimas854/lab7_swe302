@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CST Student Management System</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
+    .wrap{max-width:1100px;margin:auto;padding:24px}
+    .hero{background:#17365d;color:#fff;border-radius:16px;padding:28px;margin-bottom:18px}
+    .hero h1{margin:0 0 8px}
+    .card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 4px 15px rgba(0,0,0,.08)}
+    label{display:block;font-weight:600;margin:12px 0 6px}
+    input,select{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px}
+    button{margin-top:14px;padding:10px 16px;border:0;border-radius:8px;background:#17365d;color:#fff;cursor:pointer}
+    button.small{margin:0 6px 0 0;padding:6px 10px}
+    button.red{background:#b91c1c}
+    .status{margin-top:12px;padding:10px;border-radius:8px;background:#eef3f8}
+    .ok{background:#e9f8ee;color:#166534}
+    .bad{background:#fff0f0;color:#b91c1c}
+    .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+    .tabs button{margin-top:0;background:#64748b}
+    .tabs button.active{background:#17365d}
+    .tabs button#logoutBtn{margin-left:auto;background:#b91c1c}
+    .hidden{display:none}
+    .who{margin-bottom:14px;font-weight:600}
+    .result-table{width:100%;border-collapse:collapse;margin-top:10px}
+    .result-table th,.result-table td{border:1px solid #dbe2ea;padding:8px;text-align:left}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero"><h1>CST Student Management System</h1><div>Student Portal</div></div>
+
+  <div class="tabs" id="tabs">
+    <button class="active" data-tab="login" data-roles="out">Student Login</button>
+    <button data-tab="staffLogin" data-roles="out">Staff Login</button>
+    <button class="hidden" data-tab="dashboard" data-roles="student">Dashboard</button>
+    <button class="hidden" data-tab="payment" data-roles="student">Tuition Payment</button>
+    <button class="hidden" data-tab="registration" data-roles="student">Registration</button>
+    <button class="hidden" data-tab="results" data-roles="student">Results</button>
+    <button class="hidden" data-tab="tPayments" data-roles="teacher">Verify Payments</button>
+    <button class="hidden" data-tab="tRegs" data-roles="teacher">Module Registrations</button>
+    <button class="hidden" data-tab="adminTeachers" data-roles="admin">Manage Teachers</button>
+    <button class="hidden" id="logoutBtn">Logout</button>
+  </div>
+  <div id="who" class="who hidden"></div>
+
+  <section id="login" class="card tab">
+    <h2>Student Login</h2>
+    <label>Student ID</label><input id="studentId" placeholder="8 digits, e.g. 02240358" />
+    <label>Password</label><input id="password" type="password" placeholder="8-12 characters" />
+    <button id="loginBtn">Login</button><div id="loginStatus" class="status">Enter your details and click Login.</div>
+  </section>
+
+  <section id="staffLogin" class="card tab hidden">
+    <h2>Staff Login</h2>
+    <label>Staff ID</label><input id="staffId" placeholder="Staff ID" />
+    <label>Password</label><input id="staffPassword" type="password" />
+    <button id="staffLoginBtn">Login</button><div id="staffStatus" class="status">Enter your staff details and click Login.</div>
+  </section>
+
+  <section id="dashboard" class="card tab hidden">
+    <h2>Student Dashboard</h2><p id="welcome"></p>
+  </section>
+
+  <section id="payment" class="card tab hidden">
+    <h2>Tuition Payment</h2><p>Payment method: <b>Mobile Banking</b></p>
+    <label>Payment Screenshot</label><input id="paymentFile" type="file" accept=".jpg,.jpeg,.png" />
+    <label>Transaction Number</label><input id="transaction" placeholder="123-123456789" />
+    <button id="paymentBtn">Submit Payment</button><div id="paymentStatus" class="status">Upload proof and enter the transaction number.</div>
+    <h3>My Payments</h3><table id="myPayments" class="result-table"></table>
+  </section>
+
+  <section id="registration" class="card tab hidden">
+    <h2>Module Registration</h2>
+    <label>Module</label><select id="moduleSelect"><option>SWE302 - Software Testing &amp; Quality Assurance</option><option>DBS201 - Database Systems</option><option>WEB202 - Web Application Development</option></select>
+    <button id="registerBtn">Register Module</button><div id="registrationStatus" class="status">Choose a module and register.</div>
+    <h3>My Registrations</h3><table id="myRegs" class="result-table"></table>
+  </section>
+
+  <section id="results" class="card tab hidden">
+    <h2>Semester Results</h2><button id="showResultBtn">View My Results</button> <button id="pdfBtn" class="hidden">Download Results (PDF)</button>
+    <div id="resultsStatus" class="status">Only registered students may view results.</div>
+    <table id="resultTable" class="result-table hidden"></table>
+  </section>
+
+  <section id="tPayments" class="card tab hidden">
+    <h2>Verify Payments</h2>
+    <div id="tPayStatus" class="status">Check each payment and verify or reject it.</div>
+    <table id="payTable" class="result-table"></table>
+    <img id="shot" class="hidden" alt="Payment screenshot" style="max-width:100%;margin-top:12px;border:1px solid #dbe2ea" />
+  </section>
+
+  <section id="tRegs" class="card tab hidden">
+    <h2>Module Registrations</h2>
+    <div id="tRegStatus" class="status">Approve or reject each registration request.</div>
+    <table id="regTable" class="result-table"></table>
+  </section>
+
+  <section id="adminTeachers" class="card tab hidden">
+    <h2>Manage Teachers</h2>
+    <div id="adminStatus" class="status">Only authorised staff can log in as teachers.</div>
+    <table id="staffTable" class="result-table"></table>
+    <button id="resetBtn" class="red">Reset Test Data</button>
+  </section>
+</div>
+
+<script type="module">
+const $ = id => document.getElementById(id);
+let token = null, user = null;
+
+// Every request to the backend goes through this function.
+async function api(method, url, body) {
+  try {
+    const r = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    return await r.json();
+  } catch {
+    return { ok: false, message: 'Cannot reach the server. Is it running?' };
+  }
+}
+
+function say(id, text, ok) { const s = $(id); s.textContent = text; s.className = 'status ' + (ok ? 'ok' : 'bad'); }
+
+function button(label, fn, red) {
+  const b = document.createElement('button');
+  b.textContent = label; b.className = 'small' + (red ? ' red' : ''); b.onclick = fn;
+  return b;
+}
+
+function actions(...buttons) { const d = document.createElement('div'); buttons.forEach(b => d.appendChild(b)); return d; }
+
+function render(table, head, rows) {
+  table.innerHTML = '';
+  const h = table.insertRow();
+  head.forEach(t => { const th = document.createElement('th'); th.textContent = t; h.appendChild(th); });
+  if (!rows.length) { const td = table.insertRow().insertCell(); td.colSpan = head.length; td.textContent = 'Nothing to show yet.'; }
+  rows.forEach(r => {
+    const tr = table.insertRow();
+    r.forEach(c => { const td = tr.insertCell(); if (c instanceof Node) td.appendChild(c); else td.textContent = c; });
+  });
+}
+
+// Run an action on the server, show its message, then reload the tables.
+async function act(method, url, statusId) {
+  const r = await api(method, url);
+  say(statusId, r.message, r.ok);
+  refresh();
+}
+
+async function showScreenshot(id) {
+  const r = await fetch('/api/payments/' + id + '/screenshot', { headers: { Authorization: 'Bearer ' + token } });
+  if (!r.ok) return say('tPayStatus', 'The screenshot could not be loaded.', false);
+  $('shot').src = URL.createObjectURL(await r.blob());
+  $('shot').classList.remove('hidden');
+}
+
+async function refresh() {
+  if (!user) return;
+  if (user.role === 'student') {
+    const p = await api('GET', '/api/my/payments');
+    if (p.ok) render($('myPayments'), ['Transaction No.', 'Screenshot', 'Status'], p.payments.map(x => [x.txn, x.file, x.status]));
+    const r = await api('GET', '/api/my/registrations');
+    if (r.ok) render($('myRegs'), ['Module', 'Status'], r.registrations.map(x => [x.module, x.status]));
+  }
+  if (user.role === 'teacher') {
+    const p = await api('GET', '/api/payments');
+    if (p.ok) render($('payTable'), ['Student ID', 'Transaction No.', 'Screenshot', 'Status', 'Action'],
+      p.payments.map(x => [x.studentId, x.txn, x.file, x.status, actions(
+        button('View', () => showScreenshot(x.id)),
+        ...(x.status === 'Pending' ? [
+          button('Verify', () => act('POST', '/api/payments/' + x.id + '/verify', 'tPayStatus')),
+          button('Reject', () => act('POST', '/api/payments/' + x.id + '/reject', 'tPayStatus'), true)] : []))]));
+    const r = await api('GET', '/api/registrations');
+    if (r.ok) render($('regTable'), ['Student ID', 'Module', 'Tuition', 'Status', 'Action'],
+      r.registrations.map(x => [x.studentId, x.module, x.tuition, x.status, x.status === 'Pending' ? actions(
+        button('Approve', () => act('POST', '/api/registrations/' + x.id + '/approve', 'tRegStatus')),
+        button('Reject', () => act('POST', '/api/registrations/' + x.id + '/reject', 'tRegStatus'), true)) : '']));
+  }
+  if (user.role === 'admin') {
+    const s = await api('GET', '/api/staff');
+    if (s.ok) render($('staffTable'), ['Staff ID', 'Name', 'Status', 'Action'],
+      s.staff.map(x => [x.id, x.name, x.authorised ? 'Authorised teacher' : 'Not authorised',
+        button(x.authorised ? 'Remove authorisation' : 'Authorise as teacher', () => act('POST', '/api/staff/' + x.id + '/toggle', 'adminStatus'), x.authorised)]));
+  }
+}
+
+// Tabs and roles
+function showRole(role) {
+  document.querySelectorAll('#tabs button[data-roles]').forEach(b => b.classList.toggle('hidden', b.dataset.roles !== role));
+  $('logoutBtn').classList.toggle('hidden', role === 'out');
+  document.querySelector('#tabs button[data-roles]:not(.hidden)').click();
+}
+document.querySelectorAll('#tabs button[data-tab]').forEach(btn => btn.onclick = () => {
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab').forEach(s => s.classList.add('hidden'));
+  $(btn.dataset.tab).classList.remove('hidden');
+  refresh();
+});
+
+function startSession(r, label) {
+  token = r.token; user = { role: r.role, id: r.id };
+  $('who').textContent = label; $('who').classList.remove('hidden');
+  showRole(r.role);
+}
+
+$('logoutBtn').onclick = async () => {
+  await api('POST', '/api/logout');
+  token = null; user = null; $('who').classList.add('hidden');
+  ['studentId', 'password', 'staffId', 'staffPassword', 'transaction'].forEach(i => $(i).value = '');
+  $('paymentFile').value = '';
+  $('resultTable').classList.add('hidden'); $('pdfBtn').classList.add('hidden'); $('shot').classList.add('hidden');
+  [['loginStatus', 'Enter your details and click Login.'], ['staffStatus', 'Enter your staff details and click Login.'],
+   ['paymentStatus', 'Upload proof and enter the transaction number.'], ['registrationStatus', 'Choose a module and register.'],
+   ['resultsStatus', 'Only registered students may view results.'], ['tPayStatus', 'Check each payment and verify or reject it.'],
+   ['tRegStatus', 'Approve or reject each registration request.'], ['adminStatus', 'Only authorised staff can log in as teachers.']]
+    .forEach(([id, t]) => { $(id).textContent = t; $(id).className = 'status'; });
+  showRole('out');
+};
+
+// Student login
+$('loginBtn').onclick = async () => {
+  const r = await api('POST', '/api/login/student', { id: $('studentId').value.trim(), password: $('password').value });
+  if (!r.ok) return say('loginStatus', r.message, false);
+  say('loginStatus', 'Login successful.', true);
+  $('welcome').textContent = 'Welcome, ' + r.id + '.';
+  startSession(r, 'Logged in as student ' + r.id);
+};
+
+// Staff login (teacher or admin)
+$('staffLoginBtn').onclick = async () => {
+  const r = await api('POST', '/api/login/staff', { id: $('staffId').value.trim(), password: $('staffPassword').value });
+  if (!r.ok) return say('staffStatus', r.message, false);
+  startSession(r, 'Logged in as ' + r.role + ' ' + r.name + (r.role === 'teacher' ? ' (' + r.id + ')' : ''));
+};
+
+// Student payment
+$('paymentBtn').onclick = async () => {
+  const file = $('paymentFile').files[0];
+  let fileData = '';
+  if (file) fileData = await new Promise(done => { const fr = new FileReader(); fr.onload = () => done(fr.result); fr.readAsDataURL(file); });
+  const r = await api('POST', '/api/payments', { txn: $('transaction').value.trim(), fileName: file ? file.name : '', fileData });
+  say('paymentStatus', r.message, r.ok);
+  refresh();
+};
+
+// Student registration request
+$('registerBtn').onclick = async () => {
+  const r = await api('POST', '/api/registrations', { module: $('moduleSelect').value });
+  say('registrationStatus', r.message, r.ok);
+  refresh();
+};
+
+// Results
+let rows = [];
+$('showResultBtn').onclick = async () => {
+  const r = await api('GET', '/api/results');
+  rows = r.ok ? r.results : [];
+  if (r.ok) render($('resultTable'), ['Module Code', 'Module Title', 'Grade'], rows);
+  $('resultTable').classList.toggle('hidden', !r.ok); $('pdfBtn').classList.toggle('hidden', !r.ok);
+  say('resultsStatus', r.message, r.ok);
+};
+
+function makePdf(lines) {
+  let t = 'BT /F1 14 Tf 50 780 Td 22 TL ';
+  lines.forEach(l => { t += '(' + l.replace(/[\\()]/g, '\\$&') + ') Tj T* '; });
+  t += 'ET';
+  const o = ['<</Type/Catalog/Pages 2 0 R>>', '<</Type/Pages/Kids[3 0 R]/Count 1>>',
+    '<</Type/Page/Parent 2 0 R/MediaBox[0 0 595 842]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>',
+    '<</Length ' + t.length + '>>stream\n' + t + '\nendstream', '<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>'];
+  let p = '%PDF-1.4\n'; const x = [];
+  o.forEach((e, k) => { x.push(p.length); p += (k + 1) + ' 0 obj\n' + e + '\nendobj\n'; });
+  const r = p.length;
+  p += 'xref\n0 6\n0000000000 65535 f \n' + x.map(n => String(n).padStart(10, '0') + ' 00000 n \n').join('') + 'trailer\n<</Size 6/Root 1 0 R>>\nstartxref\n' + r + '\n%%EOF';
+  return new Blob([p], { type: 'application/pdf' });
+}
+$('pdfBtn').onclick = () => {
+  const lines = ['CST Semester Results', 'Student ID: ' + user.id, '', 'Module Code   Module Title   Grade', ...rows.map(r => r.join('   '))];
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(makePdf(lines)); a.download = 'semester_results.pdf'; a.click();
+};
+
+$('resetBtn').onclick = () => act('POST', '/api/reset', 'adminStatus');
+
+showRole('out');
+</script>
+</body>
+</html>
