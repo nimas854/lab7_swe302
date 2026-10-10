@@ -187,12 +187,12 @@ async function refresh() {
         button('View', () => showScreenshot(x.id)),
         ...(x.status === 'Pending' ? [
           button('Verify', () => act('POST', '/api/payments/' + x.id + '/verify', 'tPayStatus')),
-          button('Reject', () => act('POST', '/api/payments/' + x.id + '/reject', 'tPayStatus'), true)] : []))]));
+          button('Reject', () => { if (confirm('Reject this payment? The student will have to submit it again.')) act('POST', '/api/payments/' + x.id + '/reject', 'tPayStatus'); }, true)] : []))]));
     const r = await api('GET', '/api/registrations');
     if (r.ok) render($('regTable'), ['Student ID', 'Module', 'Tuition', 'Status', 'Action'],
       r.registrations.map(x => [x.studentId, x.module, x.tuition, x.status, x.status === 'Pending' ? actions(
         button('Approve', () => act('POST', '/api/registrations/' + x.id + '/approve', 'tRegStatus')),
-        button('Reject', () => act('POST', '/api/registrations/' + x.id + '/reject', 'tRegStatus'), true)) : '']));
+        button('Reject', () => { if (confirm('Reject this registration request?')) act('POST', '/api/registrations/' + x.id + '/reject', 'tRegStatus'); }, true)) : '']));
   }
   if (user.role === 'admin') {
     const s = await api('GET', '/api/staff');
