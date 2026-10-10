@@ -1,5 +1,5 @@
 {
-  "nextId": 3,
+  "nextId": 4,
   "students": [
     {
       "id": "02240358",
@@ -43,6 +43,14 @@
       "txn": "123-123456789",
       "file": "images (1).jpg",
       "stored": "1-images__1_.jpg",
+      "status": "Verified"
+    },
+    {
+      "id": 3,
+      "studentId": "02240358",
+      "txn": "123-123456789",
+      "file": "images.jpeg",
+      "stored": "3-images.jpeg",
       "status": "Verified"
     }
   ],

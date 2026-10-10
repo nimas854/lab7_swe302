@@ -32,6 +32,10 @@ Staff login (Staff Login tab)
 - data.json - saved data, created when the server first starts
 - uploads/ - payment screenshots, created automatically
 
+## Login and screens
+The login is kept when the page is reloaded (it is forgotten when the tab is closed or when Logout is pressed). If the server is restarted, everyone must log in again.
+The pages also fit phone screens.
+
 ## Test data
 Log in as admin and press Reset Test Data before each new test. It also deletes the uploaded screenshots.
 The test student starts with an approved SWE302 registration, so results can be viewed.

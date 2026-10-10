@@ -107,6 +107,7 @@ async function route(req, res) {
   const forbidden = () => fail(res, 403, 'You are not allowed to do this.');
 
   if (m === 'POST' && p === '/api/logout') { sessions.delete(token); return ok(res); }
+  if (m === 'GET' && p === '/api/me') return ok(res, { role: user.role, id: user.id, name: user.name });
 
   // Student
   if (p === '/api/my/payments' && m === 'GET') {

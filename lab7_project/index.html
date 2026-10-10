@@ -27,6 +27,18 @@
     .who{margin-bottom:14px;font-weight:600}
     .result-table{width:100%;border-collapse:collapse;margin-top:10px}
     .result-table th,.result-table td{border:1px solid #dbe2ea;padding:8px;text-align:left}
+    input,select{font-size:16px}
+    @media (max-width:700px){
+      .wrap{padding:12px}
+      .hero{padding:18px}
+      .hero h1{font-size:22px}
+      .card{padding:14px}
+      .tabs button{flex:1 1 calc(50% - 8px);padding:12px 8px}
+      .tabs button#logoutBtn{margin-left:0}
+      button{min-height:42px}
+      button.small{min-height:36px;margin-bottom:4px}
+      .result-table{display:block;overflow-x:auto}
+    }
   </style>
 </head>
 <body>
@@ -199,19 +211,27 @@ function showRole(role) {
 document.querySelectorAll('#tabs button[data-tab]').forEach(btn => btn.onclick = () => {
   document.querySelectorAll('#tabs button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  saveSession({ tab: btn.dataset.tab });
   document.querySelectorAll('.tab').forEach(s => s.classList.add('hidden'));
   $(btn.dataset.tab).classList.remove('hidden');
   refresh();
 });
 
+function saveSession(patch) {
+  const s = JSON.parse(sessionStorage.getItem('sms') || 'null');
+  if (s) sessionStorage.setItem('sms', JSON.stringify({ ...s, ...patch }));
+}
+
 function startSession(r, label) {
   token = r.token; user = { role: r.role, id: r.id };
+  sessionStorage.setItem('sms', JSON.stringify({ token, label, tab: '' }));
   $('who').textContent = label; $('who').classList.remove('hidden');
   showRole(r.role);
 }
 
 $('logoutBtn').onclick = async () => {
   await api('POST', '/api/logout');
+  sessionStorage.removeItem('sms');
   token = null; user = null; $('who').classList.add('hidden');
   ['studentId', 'password', 'staffId', 'staffPassword', 'transaction'].forEach(i => $(i).value = '');
   $('paymentFile').value = '';
@@ -288,7 +308,26 @@ $('pdfBtn').onclick = () => {
 
 $('resetBtn').onclick = () => act('POST', '/api/reset', 'adminStatus');
 
-showRole('out');
+// After a reload, go back to the same page if the login is still valid.
+async function restore() {
+  const saved = JSON.parse(sessionStorage.getItem('sms') || 'null');
+  if (saved) {
+    token = saved.token;
+    const r = await api('GET', '/api/me');
+    if (r.ok) {
+      user = { role: r.role, id: r.id };
+      $('welcome').textContent = 'Welcome, ' + r.id + '.';
+      $('who').textContent = saved.label; $('who').classList.remove('hidden');
+      showRole(r.role);
+      const t = document.querySelector('#tabs button[data-tab="' + saved.tab + '"]:not(.hidden)');
+      if (t) t.click();
+      return;
+    }
+    token = null; sessionStorage.removeItem('sms');
+  }
+  showRole('out');
+}
+restore();
 </script>
 </body>
 </html>
